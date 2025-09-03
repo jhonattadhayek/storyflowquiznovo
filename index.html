@@ -1,0 +1,562 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>StoryFlow Quiz - Descubra o que está bloqueando seus Stories</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Chart.js para gráficos -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Configuração do Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981',
+                        secondary: '#3B82F6',
+                        accent: '#F59E0B',
+                        danger: '#EF4444',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Estilos adicionais para o gráfico -->
+    <style>
+        .chart-bar {
+            transition: height 0.8s ease-out;
+            min-height: 8px;
+        }
+        
+        .chart-bar:hover {
+            opacity: 0.8;
+        }
+        
+        /* Animação sutil para as barras */
+        @keyframes barGrow {
+            from {
+                height: 0;
+            }
+            to {
+                height: var(--final-height);
+            }
+        }
+        
+        /* Animações para a página de checkout */
+        .border-3 {
+            border-width: 3px;
+        }
+
+        .animate-pulse-slow {
+            animation: pulse-slow 3s ease-in-out infinite;
+        }
+
+        @keyframes pulse-slow {
+            0%, 100% {
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.8;
+            }
+        }
+
+        /* Hover effects para os cards de planos */
+        .plan-card {
+            transition: all 0.3s ease;
+        }
+
+        .plan-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+        }
+
+        /* Animação para os números de autoridade */
+        .authority-card {
+            transition: all 0.3s ease;
+        }
+
+        .authority-card:hover {
+            transform: scale(1.05);
+            box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Animação para as setas do carrossel */
+        .carousel-arrow {
+            transition: all 0.2s ease;
+        }
+
+        .carousel-arrow:hover {
+            transform: scale(1.1);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Animação de entrada para os depoimentos */
+        .testimonial-card {
+            animation: fadeInUp 0.6s ease-out;
+        }
+
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Gradient animation para o timer */
+        .timer-urgent {
+            background: linear-gradient(45deg, #ef4444, #dc2626, #b91c1c);
+            background-size: 300% 300%;
+            animation: gradient-shift 2s ease infinite;
+        }
+
+        @keyframes gradient-shift {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+        
+        .chart-container {
+            background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+        }
+        
+        /* Responsividade para mobile */
+        @media (max-width: 640px) {
+            .chart-bar {
+                min-height: 6px;
+            }
+        }
+    </style>
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="Descubra o que está bloqueando seus Stories! Quiz gratuito com diagnóstico personalizado e sistema StoryFlow para destravar seu Instagram.">
+    <meta name="keywords" content="stories instagram, marketing digital, storyflow, quiz stories, engajamento instagram">
+    <meta property="og:title" content="StoryFlow Quiz - Descubra o que está bloqueando seus Stories">
+    <meta property="og:description" content="8 perguntas rápidas para destravar seus Stories e aumentar engajamento">
+    <meta property="og:type" content="website">
+</head>
+<body class="bg-gray-50 font-sans">
+    
+    <!-- Tela 1: Landing Page -->
+    <section id="landing-screen" class="screen min-h-screen bg-white flex flex-col items-center justify-center px-4 py-8">
+        <div class="max-w-lg w-full text-center space-y-8">
+
+            
+            <!-- Título Principal -->
+            <div class="space-y-6">
+                <h1 class="text-2xl md:text-3xl font-bold text-gray-800 leading-tight">
+                    🚨 Travado nos Stories? Descubra agora o que está bloqueando seu perfil!
+                </h1>
+            </div>
+            
+            <!-- Hero Character Image -->
+            <div class="flex justify-center my-8">
+                <img 
+                    src="assets/images/img-boneca01.png" 
+                    alt="Especialista em Stories" 
+                    class="w-64 h-64 md:w-80 md:h-80 object-contain"
+                >
+            </div>
+            
+            <!-- Subtítulo -->
+            <div class="space-y-6">
+                <p class="text-lg text-gray-500 font-medium">
+                    📲 Em poucos minutos você vai entender exatamente por que seus Stories não engajam como poderiam — e como resolver isso de forma simples.
+                </p>
+                
+                <div class="space-y-3 text-left">
+                    <div class="flex items-center space-x-3">
+                        <span class="text-green-500 text-xl">✅</span>
+                        <span class="text-gray-700">Identifique os principais bloqueios que estão fazendo você perder alcance e interações.</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-green-500 text-xl">✅</span>
+                        <span class="text-gray-700">Descubra o que mudar para postar com consistência sem gastar horas pensando no que dizer.</span>
+                    </div>
+                    <div class="flex items-center space-x-3">
+                        <span class="text-green-500 text-xl">✅</span>
+                        <span class="text-gray-700">No final, receba um plano de ação exclusivo para transformar dúvida em execução e começar a gerar respostas reais ainda hoje.</span>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Botão -->
+            <button 
+                onclick="startQuiz()" 
+                class="w-full bg-primary hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-xl text-lg transition-colors duration-200 shadow-lg hover:shadow-xl transform hover:scale-105"
+            >
+                👉 Clique em "Começar" e descubra o que está travando seus Stories agora mesmo!
+            </button>
+        </div>
+    </section>
+
+    <!-- Tela 2: Quiz -->
+    <section id="quiz-screen" class="screen hidden min-h-screen bg-white flex flex-col px-4 py-8">
+
+
+        <div class="flex-1 flex items-center justify-center">
+            <div class="max-w-md w-full">
+                <!-- Progress Bar -->
+                <div class="mb-8">
+                    <div class="w-full bg-gray-200 rounded-full h-2">
+                        <div id="progress-bar" class="bg-primary h-2 rounded-full transition-all duration-300" style="width: 14%"></div>
+                    </div>
+                </div>
+
+                <!-- Question Card -->
+                <div class="text-center mb-8">
+                    <h2 id="question-text" class="text-2xl font-bold text-gray-800 mb-4">
+                        <span class="text-primary">Como</span> você controla seus gastos hoje?
+                    </h2>
+                    <p class="text-gray-500 text-lg">
+                        Seja <span class="font-bold text-gray-700">100%</span> sincero.
+                    </p>
+                </div>
+
+                <!-- Answer Options -->
+                <div id="answer-options" class="space-y-4 mb-8">
+                    <!-- Options will be populated by JavaScript -->
+                </div>
+
+                <!-- Navigation -->
+                <div class="flex justify-between">
+                    <button 
+                        id="prev-btn" 
+                        onclick="previousQuestion()" 
+                        class="px-6 py-2 text-gray-600 hover:text-gray-800 font-medium disabled:opacity-50 disabled:cursor-not-allowed"
+                        disabled
+                    >
+                        ← Anterior
+                    </button>
+                    
+                    <!-- Botão próximo agora oculto, o avanço é automático -->
+                    <div class="text-sm text-gray-500 px-6 py-2">
+                        Selecione uma opção para continuar
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tela 3: Análise -->
+    <section id="analysis-screen" class="screen hidden min-h-screen bg-white flex flex-col px-4 py-8">
+
+
+        <div class="flex-1 flex items-center justify-center">
+            <div class="max-w-md w-full text-center space-y-8">
+                <div class="bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="text-6xl mb-4">🧠</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                        <span class="text-primary">Analisando</span> suas respostas...
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div id="analysis-progress" class="bg-primary h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p class="text-primary font-semibold">
+                            Progresso: <span id="analysis-percent">0</span>%
+                        </p>
+                        <p class="text-gray-500">
+                            Aguarde um momento...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tela 4: Diagnóstico -->
+    <section id="diagnosis-screen" class="screen hidden min-h-screen bg-white flex flex-col px-4 py-8">
+
+
+        <div class="flex-1 flex items-center justify-center">
+            <div class="max-w-md w-full space-y-6">
+                <!-- Diagnosis Card -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg text-center">
+                    <div id="diagnosis-emoji" class="text-6xl mb-4">😵‍💫</div>
+                    <h2 id="diagnosis-title" class="text-2xl font-bold text-gray-800 mb-4">
+                        <span class="text-primary">Falta de</span> Clareza!
+                    </h2>
+                    <p id="diagnosis-description" class="text-gray-500 text-lg leading-relaxed">
+                        Você até tenta se organizar, mas os <span class="text-gray-700 font-semibold">pequenos gastos</span> descontrolados no fim do mês acabam gerando frustração.
+                    </p>
+                </div>
+
+                <!-- Solution Card -->
+                <div class="bg-gradient-to-r from-primary to-green-600 rounded-2xl p-6 text-white text-center">
+                    <div class="text-4xl mb-4">🤩</div>
+                    <h3 class="text-xl font-bold mb-4">Boa notícia!</h3>
+                    <p class="mb-6">
+                        A verdade é que o problema não é falta de esforço. O que falta é clareza e consistência. Por isso existe o <strong>StoryFlow™️</strong>: um sistema que transforma 5 respostas rápidas em Stories prontos, persuasivos e estratégicos — para você postar em minutos e nunca mais travar.
+                    </p>
+                    <button 
+                        onclick="showVideos()" 
+                        class="w-full bg-white text-primary hover:bg-gray-100 font-semibold py-3 px-6 rounded-xl transition-colors duration-200"
+                    >
+                        Sim! Quero ver como funciona 🚀
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tela 5: Vídeos -->
+    <section id="videos-screen" class="screen hidden min-h-screen bg-white flex flex-col px-4 py-8">
+
+
+        <div class="flex-1 flex items-center justify-center">
+            <div class="max-w-lg w-full space-y-6">
+                <!-- Title -->
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-2">
+                        📢 "Veja os resultados de quem já aplicou o sistema <span class="text-primary">StoryFlow™️</span>"
+                    </h2>
+                    <p class="text-gray-500">
+                        Não importa se você tem milhares de seguidores ou está começando agora. O que faz diferença não é sorte, e sim consistência e clareza na comunicação.
+                    </p>
+                </div>
+
+                <!-- Prova Social 1 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg">
+                    <div class="aspect-video bg-gray-200 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                        <img 
+                            src="assets/images/prova social 1.jpeg" 
+                            alt="Prova social - Aumento de visualizações de 500 para 2.825 views" 
+                            class="w-full h-full object-cover"
+                        >
+                    </div>
+                    <p class="text-gray-500">
+                        🚀 "Antes, com 10 mil seguidores, meus Stories batiam no máximo 500 views. Depois do método, um único Story passou de 2.800 visualizações. Mais de 5x mais alcance sem precisar de anúncios."
+                    </p>
+                </div>
+
+                <!-- Prova Social 2 -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg">
+                    <div class="aspect-video bg-gray-200 rounded-lg mb-4 flex items-center justify-center overflow-hidden">
+                        <img 
+                            src="assets/images/prova social 2.jpeg" 
+                            alt="Prova social - Depoimento da cliente" 
+                            class="w-full h-full object-cover"
+                        >
+                    </div>
+                    <p class="text-gray-500">
+                        ✨ "Eu travava toda semana sem saber o que postar. Com o StoryFlow™️, consegui organizar meus Stories, montar meu calendário e ainda gerar novas ideias que facilitaram meu trabalho. Agora eu posto com clareza e consistência sem perder tempo."
+                    </p>
+                </div>
+
+                <!-- Fechamento da prova social -->
+                <div class="text-center mb-6">
+                    <p class="text-gray-600">
+                        Esses são só alguns exemplos. O próximo resultado pode ser o seu.
+                    </p>
+                    <p class="text-primary font-semibold mt-2">
+                        ➡️ Continue para ver como você pode sair da estagnação e ultrapassar seus concorrentes nos Stories.
+                    </p>
+                </div>
+
+                <button 
+                    onclick="showProfileSelection()" 
+                    class="w-full bg-primary hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-xl text-lg transition-colors duration-200"
+                >
+                    Continuar →
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tela 6: Seleção de Perfil -->
+    <section id="profile-screen" class="screen hidden min-h-screen bg-white flex flex-col px-4 py-8">
+
+
+        <div class="flex-1 flex items-center justify-center">
+            <div class="max-w-md w-full space-y-6">
+                <div class="text-center mb-8">
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                        📊 "Veja onde você está hoje em relação ao seu concorrente"
+                    </h2>
+                </div>
+
+                <!-- Gráfico de Comparação -->
+                <div class="bg-white rounded-2xl p-6 shadow-lg mb-6">
+                    <div class="text-center mb-6">
+                        <h3 class="text-lg font-semibold text-gray-700 mb-4">Comparação: Hoje vs. Futuro</h3>
+                    </div>
+                    
+                    <!-- Gráfico 1: Hoje -->
+                    <div class="mb-6">
+                        <h4 class="text-md font-medium text-gray-600 mb-3 text-center">Hoje (antes do StoryFlow):</h4>
+                        <div class="chart-container rounded-lg p-4">
+                            <canvas id="chart-hoje" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Gráfico 2: Futuro -->
+                    <div class="mb-4">
+                        <h4 class="text-md font-medium text-gray-600 mb-3 text-center">Futuro (com StoryFlow):</h4>
+                        <div class="chart-container rounded-lg p-4">
+                            <canvas id="chart-futuro" width="400" height="200"></canvas>
+                        </div>
+                    </div>
+                    
+                    <!-- Legenda -->
+                    <div class="text-sm text-gray-500 text-center mt-4">
+                        <p>📊 <span class="font-medium">Você</span> vs. <span class="font-medium">Concorrente</span></p>
+                    </div>
+                </div>
+
+                <!-- Botão prosseguir -->
+                <button
+                    onclick="proceedToProductInfo()"
+                    class="w-full bg-primary hover:bg-green-600 text-white font-semibold py-4 px-6 rounded-2xl text-lg transition-colors duration-200 shadow-lg"
+                >
+                    👉 Quero sair da estagnação agora
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tela 7: Loading -->
+    <section id="loading-screen" class="screen hidden min-h-screen bg-white flex flex-col px-4 py-8">
+
+
+        <div class="flex-1 flex items-center justify-center">
+            <div class="max-w-md w-full text-center space-y-8">
+                <div class="bg-white rounded-2xl p-8 shadow-lg">
+                    <div class="text-6xl mb-4">⚙️</div>
+                    <h2 class="text-2xl font-bold text-gray-800 mb-4">
+                        <span class="text-primary">Preparando</span> seu sistema StoryFlow™️...
+                    </h2>
+                    <div class="space-y-4">
+                        <div class="w-full bg-gray-200 rounded-full h-3">
+                            <div id="loading-progress" class="bg-primary h-3 rounded-full transition-all duration-300" style="width: 0%"></div>
+                        </div>
+                        <p class="text-primary font-semibold">
+                            Progresso: <span id="loading-percent">0</span>%
+                        </p>
+                        <p class="text-gray-500">
+                            Quase pronto...
+                        </p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tela 8: Informações do Produto (Etapa 1) -->
+    <section id="product-info-screen" class="screen hidden min-h-screen bg-white px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Título -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                    Chegou a hora de destravar seus Stories
+                </h1>
+            </div>
+
+            <!-- Benefícios -->
+            <div class="bg-white rounded-2xl p-8 shadow-lg mb-8">
+                <h2 class="text-2xl font-bold text-gray-800 mb-6 text-center">O que você recebe:</h2>
+                
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+                    <div class="flex items-start space-x-4">
+                        <span class="text-2xl">✅</span>
+                        <div>
+                            <h3 class="font-semibold text-lg text-gray-800">Sistema de 5 perguntas que gera Stories prontos</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <span class="text-2xl">✅</span>
+                        <div>
+                            <h3 class="font-semibold text-lg text-gray-800">Templates testados para vender mais</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <span class="text-2xl">✅</span>
+                        <div>
+                            <h3 class="font-semibold text-lg text-gray-800">Scripts que geram respostas reais</h3>
+                        </div>
+                    </div>
+                    
+                    <div class="flex items-start space-x-4">
+                        <span class="text-2xl">✅</span>
+                        <div>
+                            <h3 class="font-semibold text-lg text-gray-800">Acesso vitalício por apenas R$37</h3>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Botão prosseguir -->
+            <div class="text-center">
+                <button
+                    onclick="proceedToVideoSales()"
+                    class="bg-primary hover:bg-green-600 text-white font-semibold py-4 px-8 rounded-2xl text-lg transition-colors duration-200 shadow-lg"
+                >
+                    👉 Quero ver como funciona
+                </button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Tela 9: Vídeo de Vendas e Compra (Etapa 2) -->
+    <section id="plans-screen" class="screen hidden min-h-screen bg-white px-4 py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Headline -->
+            <div class="text-center mb-12">
+                <h1 class="text-4xl md:text-5xl font-bold text-gray-800 mb-4">
+                    🚨 Este é o momento que vai definir seu futuro nos Stories
+                </h1>
+            </div>
+
+            <!-- Vídeo de Vendas -->
+            <div class="max-w-4xl mx-auto mb-12">
+                <div style="position:relative;padding-top:177.77777777777777%;"><iframe id="panda-03b68abb-e55a-4945-b679-3d02c43701b3" src="https://player-vz-f9b6858a-acf.tv.pandavideo.com.br/embed/?v=03b68abb-e55a-4945-b679-3d02c43701b3&startTime=5" style="border:none;position:absolute;top:0;left:0;" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture" allowfullscreen=true width="100%" height="100%" fetchpriority="high"></iframe></div>
+            </div>
+
+            <!-- Preço e Compra -->
+            <div class="text-center mb-8">
+                <p class="text-2xl font-bold text-gray-800 mb-6">
+                    StoryFlow™️ por apenas R$37<br>
+                    <span class="text-lg text-gray-600">Acesso vitalício - Sem mensalidades</span>
+                </p>
+                
+                <a 
+                    href="https://pay.kiwify.com.br/g4Sxmx2"
+                    target="_blank"
+                    class="inline-block bg-primary hover:bg-green-600 text-white font-bold py-4 px-8 rounded-2xl text-xl transition-colors duration-200 shadow-lg"
+                >
+                    💳 Quero destravar meus Stories agora - R$ 37
+                </a>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script src="assets/js/supabase-config.js"></script>
+    <script src="assets/js/quiz-engine.js"></script>
+    <script src="assets/js/app.js"></script>
+    <script src="assets/js/image-tester.js"></script>
+    <script src="assets/js/charts.js"></script>
+</body>
+</html>
