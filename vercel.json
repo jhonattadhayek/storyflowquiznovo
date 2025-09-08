@@ -7,11 +7,19 @@
       "use": "@vercel/static"
     },
     {
+      "src": "oferta.html",
+      "use": "@vercel/static"
+    },
+    {
       "src": "assets/**/*",
       "use": "@vercel/static"
     }
   ],
   "rewrites": [
+    {
+      "source": "/oferta",
+      "destination": "/oferta.html"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

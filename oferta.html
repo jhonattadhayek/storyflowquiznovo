@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Oferta Especial - StoryFlow</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Supabase -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    
+    <!-- Configuração do Tailwind -->
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#10B981',
+                        secondary: '#3B82F6',
+                        accent: '#F59E0B',
+                        danger: '#EF4444',
+                    },
+                    fontFamily: {
+                        'sans': ['Inter', 'system-ui', 'sans-serif']
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <!-- Estilos adicionais -->
+    <style>
+        /* Animações para a headline */
+        .headline-highlight {
+            animation: highlightPulse 3s ease-in-out infinite;
+        }
+
+        @keyframes highlightPulse {
+            0%, 100% {
+                transform: scale(1) rotate(-1deg);
+                box-shadow: 0 4px 15px rgba(139, 92, 246, 0.3);
+            }
+            50% {
+                transform: scale(1.05) rotate(-1deg);
+                box-shadow: 0 8px 25px rgba(139, 92, 246, 0.5);
+            }
+        }
+
+        .headline-stories {
+            animation: storiesGlow 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes storiesGlow {
+            from {
+                background-color: #fef08a;
+                box-shadow: 0 0 10px rgba(254, 240, 138, 0.5);
+            }
+            to {
+                background-color: #fde047;
+                box-shadow: 0 0 20px rgba(253, 224, 71, 0.8);
+            }
+        }
+
+        /* Animação de entrada para a headline */
+        .headline-enter {
+            animation: headlineSlideIn 1s ease-out;
+        }
+
+        @keyframes headlineSlideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Animação para o botão de vendas aparecer */
+        @keyframes pulse {
+            0%, 100% {
+                transform: scale(1);
+                box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+            }
+            50% {
+                transform: scale(1.05);
+                box-shadow: 0 12px 35px rgba(139, 92, 246, 0.5);
+            }
+        }
+
+        /* Animação de entrada suave para o botão */
+        .sales-button-enter {
+            animation: slideInUp 0.8s ease-out;
+        }
+
+        @keyframes slideInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* Estilos para a seção de oferta */
+        .offer-button {
+            position: relative;
+            box-shadow: 0 8px 25px rgba(139, 92, 246, 0.3);
+        }
+
+        .offer-button::after {
+            content: '';
+            position: absolute;
+            bottom: -3px;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, #7c3aed, #5b21b6);
+            border-radius: 0 0 16px 16px;
+            opacity: 0.8;
+        }
+
+        .offer-button:hover::after {
+            opacity: 1;
+        }
+
+        /* Animação sutil para o banner roxo */
+        .bg-purple-600 {
+            background: linear-gradient(135deg, #7c3aed 0%, #5b21b6 100%);
+        }
+
+        /* Efeito hover para a caixa de preço */
+        .bg-gray-100:hover {
+            background: linear-gradient(135deg, #f3f4f6 0%, #e5e7eb 100%);
+            transform: scale(1.02);
+            transition: all 0.3s ease;
+        }
+
+        /* Animação para o aviso da oferta */
+        #offer-notice {
+            transition: opacity 0.5s ease-in-out, transform 0.5s ease-in-out;
+        }
+
+        /* Responsividade para a headline */
+        @media (max-width: 480px) {
+            .headline-mobile {
+                font-size: 1.25rem !important;
+                line-height: 1.1 !important;
+                margin-bottom: 1rem !important;
+            }
+            
+            .headline-highlight {
+                font-size: 1.1rem !important;
+                padding: 0.5rem 1.5rem !important;
+                margin: 0.5rem 0 !important;
+                width: 90% !important;
+                max-width: 300px !important;
+            }
+            
+            .headline-stories {
+                font-size: 1.1rem !important;
+                padding: 0.3rem 0.8rem !important;
+            }
+            
+            .headline-container {
+                padding: 0.5rem !important;
+                margin-bottom: 1.5rem !important;
+            }
+        }
+        
+        @media (max-width: 360px) {
+            .headline-mobile {
+                font-size: 1.1rem !important;
+            }
+            
+            .headline-highlight {
+                font-size: 1rem !important;
+                padding: 0.4rem 1.2rem !important;
+                width: 85% !important;
+                max-width: 280px !important;
+            }
+            
+            .headline-stories {
+                font-size: 1rem !important;
+                padding: 0.25rem 0.6rem !important;
+            }
+        }
+    </style>
+    
+    <!-- Fontes -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    
+    <!-- Meta Tags -->
+    <meta name="description" content="Oferta Especial StoryFlow - Nunca mais fique travado nos Stories! Sistema completo por apenas 8x de R$5,38">
+    <meta name="keywords" content="stories instagram, storyflow, oferta especial, marketing digital">
+    <meta property="og:title" content="Oferta Especial StoryFlow - Destrave seus Stories">
+    <meta property="og:description" content="Sistema completo para criar Stories persuasivos por apenas 8x de R$5,38">
+    <meta property="og:type" content="website">
+</head>
+<body class="bg-gray-50 font-sans">
+    
+    <!-- Página de Oferta -->
+    <section class="min-h-screen bg-white px-1 sm:px-4 py-4 sm:py-8">
+        <div class="max-w-4xl mx-auto">
+            <!-- Headline -->
+            <div class="text-center mb-8 sm:mb-12 headline-container">
+                <h1 class="text-xl sm:text-2xl md:text-3xl lg:text-4xl xl:text-5xl font-black text-gray-900 mb-2 sm:mb-4 leading-tight headline-enter headline-mobile">
+                    <span class="block mb-1 sm:mb-2 whitespace-nowrap">🚨 ESTE É O MOMENTO QUE VAI</span>
+                    <span class="block mb-1 sm:mb-2">
+                        <span class="bg-gradient-to-r from-purple-600 to-blue-600 text-white px-2 py-1 sm:px-3 sm:py-2 md:px-4 md:py-2 rounded-lg sm:rounded-xl inline-block transform -rotate-1 shadow-lg headline-highlight text-sm sm:text-lg md:text-xl lg:text-2xl">
+                            DEFINIR SEU FUTURO
+                        </span>
+                    </span>
+                    <span class="block text-lg sm:text-xl md:text-2xl lg:text-3xl xl:text-4xl">
+                        NOS <span class="bg-yellow-300 text-gray-900 px-1 py-0.5 sm:px-2 sm:py-1 md:px-3 md:py-1 rounded-md sm:rounded-lg font-black headline-stories">STORIES</span>
+                    </span>
+                </h1>
+            </div>
+
+            <!-- Vídeo de Vendas -->
+            <div class="max-w-4xl mx-auto mb-8">
+                <div style="position:relative;padding-top:56.25%;"><iframe id="panda-f2cc61dc-a349-4790-82f8-873514c18b63" src="https://player-vz-f9b6858a-acf.tv.pandavideo.com.br/embed/?v=f2cc61dc-a349-4790-82f8-873514c18b63&startTime=1" style="border:none;position:absolute;top:0;left:0;" allow="accelerometer;gyroscope;autoplay;encrypted-media;picture-in-picture" allowfullscreen=true width="100%" height="100%" fetchpriority="high"></iframe></div>
+            </div>
+
+            <!-- Aviso da Oferta -->
+            <div id="offer-notice" class="max-w-2xl mx-auto mb-8 text-center">
+                <div class="bg-gradient-to-r from-purple-50 to-blue-50 border-2 border-purple-200 rounded-2xl p-6 shadow-lg">
+                    <div class="flex items-center justify-center mb-3">
+                        <span class="text-3xl mr-3">⏳</span>
+                        <h3 class="text-lg sm:text-xl font-bold text-purple-800">
+                            Oferta Especial Liberada em Breve!
+                        </h3>
+                    </div>
+                    <p class="text-gray-700 text-sm sm:text-base leading-relaxed">
+                        🎯 <strong>Assista o vídeo completo</strong> e aguarde...<br>
+                        Uma oferta exclusiva será liberada especialmente para você!
+                    </p>
+                    <div class="mt-4 flex items-center justify-center space-x-2">
+                        <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse"></div>
+                        <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse" style="animation-delay: 0.2s;"></div>
+                        <div class="w-2 h-2 bg-purple-500 rounded-full animate-pulse" style="animation-delay: 0.4s;"></div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Seção de Oferta Especial -->
+            <div id="offer-section" class="max-w-2xl mx-auto opacity-0 pointer-events-none" style="transition: opacity 0.8s ease-in-out, transform 0.8s ease-in-out;">
+                <!-- Banner Superior Roxo -->
+                <div class="bg-purple-600 text-white text-center py-3 px-6 rounded-t-2xl mb-0">
+                    <div class="flex items-center justify-center space-x-2">
+                        <span class="font-bold text-lg">Condição Única Liberada</span>
+                        <span class="text-yellow-400 text-xl">🔓</span>
+                    </div>
+                </div>
+
+                <!-- Caixa Principal Branca -->
+                <div class="bg-white border-2 border-gray-200 rounded-b-2xl p-8 shadow-lg">
+                    <div class="flex flex-col md:flex-row items-center justify-between space-y-6 md:space-y-0 md:space-x-8">
+                        <!-- Texto Principal -->
+                        <div class="flex-1 text-center md:text-left">
+                            <h2 class="text-2xl md:text-3xl font-bold text-gray-800 leading-tight">
+                                Nunca mais fique travado: tenha Stories prontos e persuasivos por apenas 8x de R$5,38 👉
+                            </h2>
+                        </div>
+                        
+                        <!-- Caixa de Preço -->
+                        <div class="bg-gray-100 rounded-xl p-6 text-center min-w-[200px]">
+                            <div class="text-sm text-gray-600 mb-1">73% off</div>
+                            <div class="text-sm text-gray-600 mb-1">8x de</div>
+                            <div class="text-4xl font-bold text-gray-800 mb-1">R$ 5,38</div>
+                            <div class="text-sm text-gray-600">sem juros</div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Botão de Call-to-Action -->
+                <div class="mt-8 text-center">
+                    <a 
+                        id="sales-button"
+                        href="https://pay.kiwify.com.br/g4Sxmx2"
+                        target="_blank"
+                        class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-2xl text-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 offer-button"
+                    >
+                        👉 Sim, quero destravar meus Stories 🚀
+                    </a>
+                </div>
+
+                <!-- Informações Adicionais -->
+                <div class="mt-8 text-center text-gray-600">
+                    <p class="text-sm">
+                        ✅ Acesso vitalício • ✅ Sem mensalidades • ✅ Garantia de 7 dias
+                    </p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- JavaScript -->
+    <script src="assets/js/supabase-config.js"></script>
+    <script>
+        // Inicializar delay da seção de oferta
+        function initializeOfferSection() {
+            const offerSection = document.getElementById('offer-section')
+            const salesButton = document.getElementById('sales-button')
+            const offerNotice = document.getElementById('offer-notice')
+            
+            if (!offerSection || !salesButton || !offerNotice) {
+                console.log('Elementos da oferta não encontrados no DOM')
+                return
+            }
+
+            // Garantir que toda a seção esteja oculta inicialmente
+            offerSection.style.opacity = '0'
+            offerSection.style.pointerEvents = 'none'
+            offerSection.style.transform = 'translateY(30px)'
+
+            // Mostrar a seção completa após 2 minutos e 15 segundos (135 segundos)
+            setTimeout(() => {
+                console.log('Mostrando seção de oferta após 2 minutos e 15 segundos')
+                
+                // Ocultar o aviso
+                offerNotice.style.opacity = '0'
+                offerNotice.style.transform = 'translateY(-20px)'
+                setTimeout(() => {
+                    offerNotice.style.display = 'none'
+                }, 500)
+                
+                // Habilitar interação
+                offerSection.style.pointerEvents = 'auto'
+                
+                // Adicionar classe de animação de entrada
+                offerSection.classList.add('sales-button-enter')
+                
+                // Animar aparição da seção completa
+                offerSection.style.opacity = '1'
+                offerSection.style.transform = 'translateY(0)'
+                
+                // Adicionar uma animação sutil de "pulse" no botão após a entrada
+                setTimeout(() => {
+                    salesButton.style.animation = 'pulse 2s ease-in-out infinite'
+                }, 800) // Aguardar a animação de entrada terminar
+                
+                // Track evento de seção aparecendo
+                if (typeof trackEvent === 'function') {
+                    trackEvent('offer_page_session', 'offer_section_appeared', {
+                        delay_seconds: 135,
+                        page: 'oferta'
+                    })
+                }
+                
+            }, 135000) // 2 minutos e 15 segundos = 135000ms
+        }
+
+        // Inicializar quando a página carregar
+        document.addEventListener('DOMContentLoaded', function() {
+            console.log('Página de oferta carregada')
+            initializeOfferSection()
+        })
+
+        // Função de tracking simples (caso não tenha o sistema completo)
+        function trackEvent(sessionId, eventName, data = {}) {
+            console.log('Evento:', eventName, data)
+            // Aqui você pode adicionar seu sistema de analytics
+        }
+    </script>
+</body>
+</html>

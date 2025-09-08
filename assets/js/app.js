@@ -30,10 +30,6 @@ function showScreen(screenId) {
     // Scroll para o topo
     window.scrollTo(0, 0)
     
-    // Se for a tela de planos, inicializar funcionalidades específicas
-    if (screenId === 'plans-screen' && typeof initializePlansScreen === 'function') {
-        initializePlansScreen()
-    }
 }
 
 // Iniciar quiz
@@ -400,8 +396,9 @@ function proceedToProductInfo() {
 
 // Prosseguir para vídeo de vendas
 function proceedToVideoSales() {
-    showScreen('plans-screen')
-    trackEvent(quizEngine.sessionId, 'video_sales_shown')
+    // Redirecionar para a página de oferta
+    trackEvent(quizEngine.sessionId, 'redirecting_to_offer')
+    window.location.href = '/oferta'
 }
 
 // Selecionar perfil (mantido para compatibilidade)
@@ -873,28 +870,6 @@ function subscribePlan(planType, billingType) {
     }
 }
 
-// Funcionalidades específicas para a tela de planos
-function initializePlansScreen() {
-    // Limpar timers anteriores se existirem
-    if (testimonialInterval) {
-        clearInterval(testimonialInterval)
-        testimonialInterval = null
-    }
-    if (countdownInterval) {
-        clearInterval(countdownInterval)
-        countdownInterval = null
-    }
-    
-    // Delay para garantir que o DOM foi renderizado
-    setTimeout(() => {
-        try {
-            initializeTestimonialsCarousel()
-            startCountdownTimer()
-        } catch (error) {
-            console.error('Erro ao inicializar funcionalidades da tela de planos:', error)
-        }
-    }, 200) // Aumentei o delay para 200ms para garantir que tudo seja renderizado
-}
 
 // Limpar timers quando sair da página
 window.addEventListener('beforeunload', () => {
