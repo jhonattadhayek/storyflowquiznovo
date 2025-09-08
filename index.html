@@ -176,34 +176,6 @@
             transition: all 0.3s ease;
         }
 
-        /* Estilos para a imagem hero */
-        .hero-image {
-            transition: all 0.3s ease;
-            border: 3px solid transparent;
-            background: linear-gradient(white, white) padding-box,
-                        linear-gradient(135deg, #10B981, #3B82F6) border-box;
-            max-height: 400px;
-        }
-
-        .hero-image:hover {
-            transform: scale(1.05);
-            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.15);
-        }
-
-        /* Responsividade adicional para a imagem */
-        @media (max-width: 640px) {
-            .hero-image {
-                max-height: 300px;
-                max-width: 100%;
-            }
-        }
-
-        @media (max-width: 480px) {
-            .hero-image {
-                max-height: 250px;
-                max-width: 100%;
-            }
-        }
 
         /* Animação para o botão de vendas aparecer */
         @keyframes pulse {
@@ -266,7 +238,7 @@
                 <img 
                     src="assets/images/BANNER-STORYFLOW-V2.webp" 
                     alt="Banner StoryFlow" 
-                    class="hero-image w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl object-contain rounded-3xl shadow-lg"
+                    class="w-full max-w-4xl object-contain rounded-lg"
                 >
             </div>
             
