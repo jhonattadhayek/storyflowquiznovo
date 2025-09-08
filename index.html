@@ -182,6 +182,7 @@
             border: 3px solid transparent;
             background: linear-gradient(white, white) padding-box,
                         linear-gradient(135deg, #10B981, #3B82F6) border-box;
+            max-height: 400px;
         }
 
         .hero-image:hover {
@@ -190,10 +191,17 @@
         }
 
         /* Responsividade adicional para a imagem */
+        @media (max-width: 640px) {
+            .hero-image {
+                max-height: 300px;
+                max-width: 100%;
+            }
+        }
+
         @media (max-width: 480px) {
             .hero-image {
-                width: 12rem !important;
-                height: 12rem !important;
+                max-height: 250px;
+                max-width: 100%;
             }
         }
 
@@ -256,9 +264,9 @@
             <!-- Hero Character Image -->
             <div class="flex justify-center my-8">
                 <img 
-                    src="assets/images/3d-gabriel.jpeg" 
-                    alt="Especialista em Stories" 
-                    class="hero-image w-48 h-48 sm:w-56 sm:h-56 md:w-64 md:h-64 lg:w-80 lg:h-80 object-cover rounded-3xl shadow-lg"
+                    src="assets/images/BANNER-STORYFLOW-V2.webp" 
+                    alt="Banner StoryFlow" 
+                    class="hero-image w-full max-w-sm sm:max-w-md md:max-w-lg lg:max-w-xl object-contain rounded-3xl shadow-lg"
                 >
             </div>
             
