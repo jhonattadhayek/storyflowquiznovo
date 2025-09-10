@@ -203,6 +203,24 @@
     <meta property="og:title" content="Oferta Especial StoryFlow - Destrave seus Stories">
     <meta property="og:description" content="Sistema completo para criar Stories persuasivos por apenas 8x de R$5,38">
     <meta property="og:type" content="website">
+    
+    <!-- Meta Pixel Code -->
+    <script>
+    !function(f,b,e,v,n,t,s)
+    {if(f.fbq)return;n=f.fbq=function(){n.callMethod?
+    n.callMethod.apply(n,arguments):n.queue.push(arguments)};
+    if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';
+    n.queue=[];t=b.createElement(e);t.async=!0;
+    t.src=v;s=b.getElementsByTagName(e)[0];
+    s.parentNode.insertBefore(t,s)}(window, document,'script',
+    'https://connect.facebook.net/en_US/fbevents.js');
+    fbq('init', '1876198866338063');
+    fbq('track', 'PageView');
+    </script>
+    <noscript><img height="1" width="1" style="display:none"
+    src="https://www.facebook.com/tr?id=1876198866338063&ev=PageView&noscript=1"
+    /></noscript>
+    <!-- End Meta Pixel Code -->
 </head>
 <body class="bg-gray-50 font-sans">
     
@@ -286,6 +304,7 @@
                         id="sales-button"
                         href="https://pay.kiwify.com.br/g4Sxmx2"
                         target="_blank"
+                        onclick="trackPurchase()"
                         class="inline-block bg-purple-600 hover:bg-purple-700 text-white font-bold py-4 px-8 rounded-2xl text-xl transition-all duration-200 shadow-lg hover:shadow-xl transform hover:scale-105 offer-button"
                     >
                         👉 Sim, quero destravar meus Stories 🚀
@@ -304,6 +323,7 @@
 
     <!-- JavaScript -->
     <script src="assets/js/supabase-config.js"></script>
+    <script src="assets/js/meta-tracking.js"></script>
     <script>
         // Inicializar delay da seção de oferta
         function initializeOfferSection() {
@@ -361,6 +381,18 @@
         // Inicializar quando a página carregar
         document.addEventListener('DOMContentLoaded', function() {
             console.log('Página de oferta carregada')
+            
+            // Disparar evento personalizado "viewoferta" quando a página carregar
+            if (typeof MetaTracking !== 'undefined') {
+                MetaTracking.trackCustomEvent('viewoferta')
+            } else if (typeof fbq !== 'undefined') {
+                fbq('track', 'viewoferta', {
+                    content_name: 'StoryFlow Oferta Especial',
+                    content_category: 'oferta'
+                })
+                console.log('Evento viewoferta disparado')
+            }
+            
             initializeOfferSection()
         })
 
@@ -368,6 +400,35 @@
         function trackEvent(sessionId, eventName, data = {}) {
             console.log('Evento:', eventName, data)
             // Aqui você pode adicionar seu sistema de analytics
+        }
+
+        // Função para trackear o clique no botão de compra
+        function trackPurchase() {
+            console.log('Botão de compra clicado - disparando evento de conversão')
+            
+            // Usar o sistema de tracking organizado se disponível
+            if (typeof MetaTracking !== 'undefined') {
+                MetaTracking.trackCustomEvent('purchase', {
+                    content_ids: ['storyflow-sistema'],
+                    num_items: 1
+                })
+            } else if (typeof fbq !== 'undefined') {
+                // Fallback para o sistema antigo
+                fbq('track', 'concluir registro', {
+                    content_name: 'StoryFlow Sistema Completo',
+                    content_category: 'checkout',
+                    content_ids: ['storyflow-sistema'],
+                    num_items: 1
+                })
+                console.log('Evento concluir registro disparado')
+                
+                // Disparar evento padrão CompleteRegistration do Facebook
+                fbq('track', 'CompleteRegistration', {
+                    content_name: 'StoryFlow Sistema Completo',
+                    content_category: 'checkout'
+                })
+                console.log('Evento CompleteRegistration disparado')
+            }
         }
     </script>
 </body>
