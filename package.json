@@ -18,7 +18,8 @@
   "author": "Jhonatta Hayek",
   "license": "MIT",
   "devDependencies": {
-    "http-server": "^14.1.1"
+    "http-server": "^14.1.1",
+    "vercel": "^48.0.0"
   },
   "engines": {
     "node": ">=16.0.0"
